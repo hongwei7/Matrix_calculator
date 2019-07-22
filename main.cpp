@@ -198,7 +198,7 @@ double str_to_double(char t[10])
 matrix* load_data(matrix mats[],int&n)
 {
     ifstream infile;
-    infile.open("/Users/lulu/Desktop/C++/Matrix_cal/data.txt",ios::in);
+    infile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::in);
     if(infile)
         {
             int i=-1;
@@ -268,7 +268,7 @@ void output(matrix mats[],int n)
 void save_data(matrix* mats,int n)
 {
     ofstream outfile;
-    outfile.open("/Users/lulu/Desktop/C++/Matrix_cal/data.txt",ios::out);
+    outfile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::out);
     for(int i=0;i<n;i++)
     {
         if(i>=1)outfile<<endl;
