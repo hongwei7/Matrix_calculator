@@ -62,14 +62,15 @@ void matrix::cin_data()
 }
 void matrix::show_mat()
 {
-    int lenth=5;
+    int lenth=12;
     cout<<"矩阵名: "<<name<<"  矩阵大小: "<<n_r<<'x'<<n_c<<endl;
     for(int i=0;i<n_r;i++)
     {
         cout<<'[';
         for(int j=0;j<n_c;j++)
         {
-            cout<<setw(lenth-1)<<data[i][j];
+            if(data[i][j]<1e-6&&data[i][j]>-1e-6)cout<<setw(lenth-1)<<0.0;
+            else cout<<setw(lenth-1)<<data[i][j];
             cout<<',';
         }
         cout<<'\b'<<"]"<<endl;
@@ -224,7 +225,7 @@ void plus_menu(matrix mats[],int &n)
             mats[b].show_mat();
             if(mats[a].get_n_r()!=mats[b].get_n_r()||mats[a].get_n_c()!=mats[b].get_n_c())
             {
-                cout<<"两矩阵不能相加！"<<mats[a].get_n_c()<<"!="<<mats[b].get_n_r()<<")"<<endl;
+                cout<<"两矩阵不能相加！"<<endl;
             }
             else
             {
@@ -240,7 +241,7 @@ void plus_menu(matrix mats[],int &n)
     system("read -p \"回车以继续\"");
     return;
 }
-double str_to_double(char t[10])
+double str_to_double(char t[20])
 {
     double k=0,result=0;
     char *p=t;
@@ -286,7 +287,7 @@ matrix* load_data(matrix mats[],int&n)
             int i=-1;
             while(!infile.eof()&&(++i<50))
             {
-                char t[10];
+                char t[20];
                 int m1,m2;
                 infile>>t>>m1>>m2;
                 matrix newmat;
@@ -361,7 +362,8 @@ void save_data(matrix* mats,int n)
             for(int j2=0;j2<mats[i].get_n_c();j2++)
             {
                 if(j2==0)outfile<<endl;
-                outfile<<mats[i].get_data(j1,j2);
+                if(mats[i].get_data(j1,j2)<1e-6&&mats[i].get_data(j1,j2)>-1e-6)outfile<<0;
+                else outfile<<mats[i].get_data(j1,j2);
                 if(j2<mats[i].get_n_c()-1)outfile<<' ';
             }
         }
@@ -584,7 +586,7 @@ void rank_menu(matrix mats[],int n)
     system("read -p \"回车以继续\"");
     return;
 }
-void inverse(double data[50][50],int m,int n)//化为阶梯型
+void inverse(double data[50][50],int m,int n)//高斯消元法
 {
     double inv[50][50];
     for(int i=0;i<m;i++)
@@ -710,12 +712,13 @@ int main()
         cout<<"|-----------------------------------|"<<endl;
         cout<<"|   1.定义新矩阵                    |"<<endl;
         cout<<"|   2.显示已有矩阵                  |"<<endl;
-        cout<<"|   3.矩阵乘法计算                  |"<<endl;
-        cout<<"|   4.行列式计算                    |"<<endl;
-        cout<<"|   5.求矩阵转置                    |"<<endl;
-        cout<<"|   6.求矩阵的阶梯型和秩            |"<<endl;
-        cout<<"|   7.求矩阵的逆                    |"<<endl;
-        cout<<"|   8.保存&退出                     |"<<endl;
+        cout<<"|   3.矩阵加法计算                  |"<<endl;
+        cout<<"|   4.矩阵乘法计算                  |"<<endl;
+        cout<<"|   5.计算行列式                    |"<<endl;
+        cout<<"|   6.求矩阵转置                    |"<<endl;
+        cout<<"|   7.求矩阵的阶梯型和秩            |"<<endl;
+        cout<<"|   8.求矩阵的逆                    |"<<endl;
+        cout<<"|   9.保存&退出                     |"<<endl;
         cout<<" ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
         cout<<"你的选择:";
         cin>>chosen_num;
@@ -723,14 +726,15 @@ int main()
         {
             case(1):{input(mats,n);break;}
             case(2):{output(mats,n);break;}
-            case(3):{multiply_menu(mats,n);break;}
-            case(4):{determinant_menu(mats,n);break;}
-            case(5):{transpose_menu(mats,n);break;}
-            case(6):{rank_menu(mats,n);break;}
-            case(7):{inverse_menu(mats,n);break;}
+            case(3):{plus_menu(mats,n);break;}
+            case(4):{multiply_menu(mats,n);break;}
+            case(5):{determinant_menu(mats,n);break;}
+            case(6):{transpose_menu(mats,n);break;}
+            case(7):{rank_menu(mats,n);break;}
+            case(8):{inverse_menu(mats,n);break;}
             default:break;
         }
-        if(chosen_num==8)
+        if(chosen_num==9)
         {
             save_data(mats,n);
             getchar();
