@@ -176,6 +176,70 @@ void multiply_menu(matrix mats[],int &n)
     system("read -p \"回车以继续\"");
     return;
 }
+matrix plus_method(matrix A,matrix B,char*s)//矩阵加法
+{
+    matrix result;
+    double new_data[50][50];
+    result.init(A.get_n_r(),B.get_n_c(),s);
+    for(int i=0;i<A.get_n_r();i++)
+    {
+        for(int j=0;j<B.get_n_c();j++)
+        {
+            new_data[i][j]=A.get_data(i,j)+B.get_data(i,j);
+        }
+    }
+    result.edit_data(new_data);
+    return result;
+
+}
+void plus_menu(matrix mats[],int &n)
+{
+    char mat1[10],mat2[10],name[10];
+    int a=-1,b=-1;
+    cout<<"输入要做加法的第一个矩阵（输入名字）:"<<endl;
+    cin>>mat1;
+    for(int i=0;i<n;i++)
+    {
+        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
+    }
+    if(a==-1)
+    {
+        cout<<"找不到相应的矩阵"<<endl;
+    }
+    else 
+    {
+        mats[a].show_mat();
+        cout<<"输入要做加法的第二个矩阵（输入名字）:"<<endl;
+        cin>>mat2;
+        for(int i=0;i<n;i++)
+        {
+            if(strcmp(mats[i].show_name(),mat2)==0)b=i;
+        }
+        if(b==-1)
+        {
+            cout<<"找不到相应的矩阵"<<endl;
+        }
+        else
+        {
+            mats[b].show_mat();
+            if(mats[a].get_n_r()!=mats[b].get_n_r()||mats[a].get_n_c()!=mats[b].get_n_c())
+            {
+                cout<<"两矩阵不能相加！"<<mats[a].get_n_c()<<"!="<<mats[b].get_n_r()<<")"<<endl;
+            }
+            else
+            {
+                cout<<"请输入相加矩阵的名字:"<<endl;
+                cin>>name;
+                mats[n]=plus_method(mats[a],mats[b],name);
+                n++;
+                cout<<"已完成运算"<<endl;
+                mats[n-1].show_mat();
+            }
+        }
+    }
+    system("read -p \"回车以继续\"");
+    return;
+}
 double str_to_double(char t[10])
 {
     double k=0,result=0;
@@ -556,7 +620,7 @@ void inverse(double data[50][50],int m,int n)//化为阶梯型
         }
         done_row++;
     }
-//化为单位阵
+    //化为单位阵
     done_row=m-1;
     for(int i=m-1;i>=0;i--)
     {
