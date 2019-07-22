@@ -5,7 +5,7 @@ using namespace std;
 class matrix
 {
 private:
-    int n_r,n_c;
+    int n_r,n_c;//矩阵实际含数据大小
     double data[50][50];//矩阵大小上限为50x50
     char name[10];
 public:
@@ -36,15 +36,23 @@ void matrix::cin_data()
         if(k==0)getchar();
         char temp[500],*p=temp;
         cin.getline(temp, 500);
+        bool negitive=false;
         while(i<n_c)
         {
+            if(*p=='-')
+            {
+                p++;
+                negitive=true;
+            }
             double t=0;
             while((*p!=' ')&&(*p!='\0'))
                 {
                     t=10*t+double(*p-48);
                     p++;
                 }
+            if(negitive)t=-t;
             data[k][i]=t;
+            negitive=false;
             if((*p)=='\0')break;
             p++;
             i++;        
@@ -172,28 +180,38 @@ double str_to_double(char t[10])
 {
     double k=0,result=0;
     char *p=t;
-    bool doted=false;
+    bool doted=false,negitive=false;
     for(int i=0;i<10;i++)
     {
-        if(*(p)!='\0')
+        if(*(p)=='-')
         {
-            if(*(p)!='.')
-            {
-                if(!doted)result=result*10+int(*p-48);
-                if(doted){result=result+k*int(*p-48);k*=0.1;}
-            }
-            else
-            {
-                doted=true;
-                k=0.1;
-            }
+            negitive=true;
         }
         else
         {
-            return result;
+            if(*(p)!='\0')
+            {
+                if(*(p)!='.')
+                {
+                    if(!doted)result=result*10+int(*p-48);
+                    if(doted){result=result+k*int(*p-48);k*=0.1;}
+                }
+                else
+                {
+                    doted=true;
+                    k=0.1;
+                }
+            }
+            else
+            {
+                if(negitive)result=-result;
+                return result;
+            }
         }
         p++;
-    }return result;
+    }
+    if(negitive)result=-result;
+    return result;
 }
 matrix* load_data(matrix mats[],int&n)
 {
@@ -403,7 +421,6 @@ void transpose_menu(matrix mats[],int n)
     system("read -p \"回车以继续\"");
     return;
 }
-
 void swap_row(double data[50][50],int i,int j)
 {
     double t;
@@ -414,10 +431,10 @@ void swap_row(double data[50][50],int i,int j)
         data[j][k]=t;
     }
 }
-void cancel_row(double data[50][50],int i,int j,int n_c)//cancel的两行号&所在列
+void cancel_row(double data[50][50],int i,int j,int n_c,double k)//cancel的两行号&所在列
 {   
-    double k=-data[j][n_c]/data[i][n_c];
-    for(int l=n_c;l<50;l++)
+    
+    for(int l=0;l<50;l++)
     {
         data[j][l]=data[j][l]+k*data[i][l];
     }
@@ -441,13 +458,14 @@ void row_echelon_form(double data[50][50],int m,int n)//化为阶梯型
         }
         for(int j=done_row+1;j<m;j++)
         {
-            cancel_row(data,done_row,j,i);
+            double k=-data[j][i]/data[done_row][i];
+            cancel_row(data,done_row,j,i,k);
         }
         done_row++;
     }
 }
 
-int rank_method(matrix A)
+int rank_method(matrix A,bool show_ladder=false)
 {
     int rank=0;
     double new_data[50][50];
@@ -459,12 +477,15 @@ int rank_method(matrix A)
         }
     }
     row_echelon_form(new_data,A.get_n_r(),A.get_n_c());
-    cout<<"矩阵的阶梯型为："<<endl;
-    matrix t;
-    char name[10]="阶梯型";
-    t.init(A.get_n_r(),A.get_n_c(),name);
-    t.edit_data(new_data);
-    t.show_mat();
+    if(show_ladder)
+    {
+        cout<<"矩阵的阶梯型为："<<endl;
+        matrix t;
+        char name[10]="阶梯型";
+        t.init(A.get_n_r(),A.get_n_c(),name);
+        t.edit_data(new_data);
+        t.show_mat();
+    }
     for(;rank<min(A.get_n_c(),A.get_n_r());rank++)
     {
         int is_zero=0;
@@ -493,12 +514,123 @@ void rank_menu(matrix mats[],int n)
     else 
     {
         mats[a].show_mat();
-        int rank=rank_method(mats[a]);
+        int rank=rank_method(mats[a],true);
         cout<<"矩阵的秩为："<<rank<<endl;
     }
     system("read -p \"回车以继续\"");
     return;
-}int main()
+}
+void inverse(double data[50][50],int m,int n)//化为阶梯型
+{
+    double inv[50][50];
+    for(int i=0;i<m;i++)
+    {
+        for(int j=0;j<m;j++)
+        {
+            inv[i][j]=0;
+            if(i==j)inv[i][j]=1;
+
+        }
+    }
+    int done_row=0;
+    for(int i=0;i<n;i++)
+    {
+        if(data[done_row][i]==0)//首项不为0
+        {
+            for(int k=i+1;k<m;k++)
+            {
+                if(data[k][i]!=0)
+                {
+                    swap_row(data,i,k);
+                    swap_row(inv,i,k);
+                    break;
+                }
+            }
+            if(data[done_row][i]==0)continue;
+        }
+        for(int j=done_row+1;j<m;j++)
+        {
+            double k=-data[j][i]/data[done_row][i];
+            cancel_row(data,done_row,j,i,k);
+            cancel_row(inv,done_row,j,i,k);
+        }
+        done_row++;
+    }
+//化为单位阵
+    done_row=m-1;
+    for(int i=m-1;i>=0;i--)
+    {
+        for(int j=i-1;j>=0;j--)
+        {
+            double k=-data[j][i]/data[done_row][i];
+            cancel_row(data,done_row,j,i,k);
+            cancel_row(inv,done_row,j,i,k);
+        }
+        done_row--;
+    }
+    for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<50;j++)
+            {
+                inv[i][j]=inv[i][j]/data[i][i];
+            }
+        }
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<50;j++)
+            {
+                data[i][j]=inv[i][j];
+            }
+        }
+}
+
+void inverse_menu(matrix mats[],int &n)
+{
+    char mat1[10],name[10];
+    int a=-1,b=-1;
+    cout<<"输入要求逆的矩阵（输入名字）:"<<endl;
+    cin>>mat1;
+    for(int i=0;i<n;i++)
+    {
+        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
+    }
+    if(a==-1)
+    {
+        cout<<"找不到相应的矩阵"<<endl;
+    }
+    else if(mats[a].get_n_r()!=mats[a].get_n_c()||(rank_method(mats[a])!=mats[a].get_n_r()))
+    {
+        mats[a].show_mat();
+        cout<<"矩阵非方阵或不可逆"<<endl;
+    }
+    else 
+    {
+        mats[a].show_mat();
+        matrix inv;
+        char name[10];
+        double copy_data[50][50];
+        for(int i=0;i<50;i++)
+        {
+            for(int j=0;j<50;j++)
+            {
+                copy_data[i][j]=mats[a].get_data(i,j);
+            }
+        }
+        cout<<"请输入逆矩阵的名字："<<endl;
+        cin>>name;
+        inv.init(mats[a].get_n_r(),mats[a].get_n_c(),name);
+        inverse(copy_data,mats[a].get_n_r(),mats[a].get_n_c());
+        inv.edit_data(copy_data);
+        cout<<"运算已完成，逆矩阵为："<<endl;
+        inv.show_mat();
+        mats[n]=inv;
+        n++;
+    }
+
+    system("read -p \"回车以继续\"");
+    return;
+}
+int main()
 {
     matrix mats1[50];
     int n=0,chosen_num;
@@ -518,7 +650,8 @@ void rank_menu(matrix mats[],int n)
         cout<<"|   4.行列式计算                    |"<<endl;
         cout<<"|   5.求矩阵转置                    |"<<endl;
         cout<<"|   6.求矩阵的阶梯型和秩            |"<<endl;
-        cout<<"|   7.保存&退出                     |"<<endl;
+        cout<<"|   7.求矩阵的逆                    |"<<endl;
+        cout<<"|   8.保存&退出                     |"<<endl;
         cout<<" ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
         cout<<"你的选择:";
         cin>>chosen_num;
@@ -530,9 +663,10 @@ void rank_menu(matrix mats[],int n)
             case(4):{determinant_menu(mats,n);break;}
             case(5):{transpose_menu(mats,n);break;}
             case(6):{rank_menu(mats,n);break;}
+            case(7):{inverse_menu(mats,n);break;}
             default:break;
         }
-        if(chosen_num==7)
+        if(chosen_num==8)
         {
             save_data(mats,n);
             getchar();
