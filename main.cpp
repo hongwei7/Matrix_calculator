@@ -118,7 +118,7 @@ void num_multiply_menu(matrix mats[],int &n)
     char mat1[10],name[10];
     double k;
     int a=-1,b=-1;
-    cout<<"输入要做乘法的第一个矩阵（输入名字）:"<<endl;
+    cout<<"输入要做数乘的矩阵（输入名字）:"<<endl;
     cin>>mat1;
     for(int i=0;i<n;i++)
     {
@@ -351,6 +351,16 @@ double str_to_double(char *t)
     double k=0,result=0;
     char *p=t;
     bool doted=false,negitive=false,_e=false,_e_sign=true;
+    //check inf or nan
+    switch(*p)
+    {
+        case('n'):return 0.0;
+        case('i'):return 1.79769e+308;
+    }
+    if(*(p+1)=='i')
+    {
+        return -1.79769e+308;
+    }
     while(true)
     {   
         if(_e)
@@ -828,24 +838,19 @@ int main()
     while(1)
     {
         system("reset");//reset为Linux下清屏命令
-        cout<<"\t"<<"矩阵计算器";
+        cout<<"\t\t"<<"矩阵计算器";
         cout<<" (已存在"<<n<<"个矩阵)";
         cout<<endl;
-        cout<<" ___________________________________"<<endl;
-        cout<<"|  请选择数字(1-5):                 |"<<endl;
-        cout<<"|-----------------------------------|"<<endl;
-        cout<<"|   1.定义新矩阵                    |"<<endl;
-        cout<<"|   2.显示已有矩阵                  |"<<endl;
-        cout<<"|   3.矩阵加法计算                  |"<<endl;
-        cout<<"|   4.矩阵数乘计算                  |"<<endl;
-        cout<<"|   5.矩阵乘法计算                  |"<<endl;
-        cout<<"|   6.矩阵幂次计算                  |"<<endl;
-        cout<<"|   7.计算行列式                    |"<<endl;
-        cout<<"|   8.求矩阵转置                    |"<<endl;
-        cout<<"|   9.求矩阵的阶梯型和秩            |"<<endl;
-        cout<<"|   10.求矩阵的逆                    |"<<endl;
-        cout<<"|   11.保存&退出                     |"<<endl;
-        cout<<" ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
+        cout<<" _______________________________________________"<<endl;
+        cout<<"|  请选择数字(1-11):                            |"<<endl;
+        cout<<"|-----------------------------------------------|"<<endl;
+        cout<<"|   1.定义新矩阵          |  2.显示已有矩阵     |"<<endl;
+        cout<<"|   3.矩阵加法计算        |  4.矩阵数乘计算     |"<<endl;
+        cout<<"|   5.矩阵乘法计算        |  6.矩阵幂次计算     |"<<endl;
+        cout<<"|   7.计算行列式          |  8.求矩阵转置       |"<<endl;
+        cout<<"|   9.求矩阵的阶梯型和秩  |  10.求矩阵的逆      |"<<endl;
+        cout<<"|   11.保存&退出          |                     |"<<endl;
+        cout<<" ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
         cout<<"你的选择:";
         cin>>chosen_num;
         switch(chosen_num)
