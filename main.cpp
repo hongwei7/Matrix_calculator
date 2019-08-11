@@ -2,7 +2,75 @@
 #include<iomanip>
 #include<fstream>
 using namespace std;
-//矩阵定义部分
+
+double str_to_double(char *t)//数值处理
+{
+    double k=0,result=0;
+    char *p=t;
+    bool doted=false,negitive=false,_e=false,_e_sign=true;
+    //检查inf和nan
+    switch(*p)
+    {
+        case('n'):return 0.0;
+        case('i'):return 1.79769e+308;
+    }
+    if(*(p+1)=='i')
+    {
+        return -1.79769e+308;
+    }
+    while(true)
+    {   
+        if(_e)
+        {
+            int power=int(str_to_double(p));
+            for(int i=0;i<power;i++)
+            {
+                if(_e_sign)result=result*10;
+                else result=result/10;
+            }
+            break;
+        }
+        else
+        {
+            if(*(p)=='-'&&!_e)
+            {
+                negitive=true;
+            }
+            else if(*p=='e')
+            {
+                _e=true;
+                p++;
+                if(*p=='-')_e_sign=false;
+                else if(*p!='+')continue;
+            }
+            else
+            {
+                if(*(p)!='\0')
+                {
+                    if(*(p)!='.')
+                    {
+                        if(!doted)result=result*10+int(*p-48);
+                        if(doted){result=result+k*int(*p-48);k*=0.1;}
+                    }
+                    else
+                    {
+                        doted=true;
+                        k=0.1;
+                    }
+                }
+                else
+                {
+                    if(negitive)result=-result;
+                    return result;
+                }
+            }
+        }
+        p++;
+    }
+    if(negitive)result=-result;
+    return result;
+}
+//矩阵类定义部分
 class matrix
 {
 private:
@@ -37,25 +105,17 @@ void matrix::cin_data()
         if(k==0)getchar();
         char temp[500],*p=temp;
         cin.getline(temp, 500);
-        bool negitive=false;
         while(i<n_c)
         {
-            if(*p=='-')
+            char char_number[20];
+            for(int j=0;(*p!=' '&&*p!='\0');j++)
             {
+                char_number[j]=*p;
+                char_number[j+1]='\0';
                 p++;
-                negitive=true;
             }
-            double t=0;
-            while((*p!=' ')&&(*p!='\0'))
-                {
-                    t=10*t+double(*p-48);
-                    p++;
-                }
-            if(negitive)t=-t;
-            data[k][i]=t;
-            negitive=false;
-            if((*p)=='\0')break;
             p++;
+            data[k][i]=str_to_double(char_number);
             i++;        
         }
     }cout<<"已生成";
@@ -70,7 +130,7 @@ void matrix::show_mat()
         cout<<'[';
         for(int j=0;j<n_c;j++)
         {
-            if(data[i][j]<1e-16&&data[i][j]>-1e-16)cout<<setw(lenth-1)<<0.0;
+            if(data[i][j]<1e-15&&data[i][j]>-1e-15)cout<<setw(lenth-1)<<0.0;
             else cout<<setw(lenth-1)<<data[i][j];
             cout<<',';
         }
@@ -116,21 +176,6 @@ double vector_dot(double*a,double*b,int n)//向量点积
     }
     return result;
 }
-matrix multiply_method(matrix A,matrix B,char*s)//矩阵乘法
-{
-    matrix result;
-    double new_data[50][50];
-    result.init(A.get_n_r(),B.get_n_c(),s);
-    for(int i=0;i<A.get_n_r();i++)
-    {
-        for(int j=0;j<B.get_n_c();j++)
-        {
-            new_data[i][j]=vector_dot(A.get_row(i),B.get_col(j),A.get_n_c());
-        }
-    }
-    result.edit_data(new_data);
-    return result;
-}
 matrix plus_method(matrix A,matrix B,char*s)//矩阵加法
 {
     matrix result;
@@ -141,6 +186,21 @@ matrix plus_method(matrix A,matrix B,char*s)//矩阵加法
         for(int j=0;j<B.get_n_c();j++)
         {
             new_data[i][j]=A.get_data(i,j)+B.get_data(i,j);
+        }
+    }
+    result.edit_data(new_data);
+    return result;
+}
+matrix multiply_method(matrix A,matrix B,char*s)//矩阵乘法
+{
+    matrix result;
+    double new_data[50][50];
+    result.init(A.get_n_r(),B.get_n_c(),s);
+    for(int i=0;i<A.get_n_r();i++)
+    {
+        for(int j=0;j<B.get_n_c();j++)
+        {
+            new_data[i][j]=vector_dot(A.get_row(i),B.get_col(j),A.get_n_c());
         }
     }
     result.edit_data(new_data);
@@ -226,11 +286,11 @@ double determinant(matrix A)//计算行列式
     }
     return laplace_expansion(A.get_n_r(),data);
 }
-matrix transpose_method(matrix A)//矩阵转置
+matrix transpose_method(matrix A,char name[10])//矩阵转置
 {
     double new_data[50][50];
     matrix newmat;
-    newmat.init(A.get_n_c(),A.get_n_r(),A.show_name());
+    newmat.init(A.get_n_c(),A.get_n_r(),name);
     for(int i=0;i<A.get_n_r();i++)
     {
         for(int j=0;j<A.get_n_c();j++)
@@ -253,7 +313,6 @@ void swap_row(double data[50][50],int i,int j)//交换两行
 }
 void cancel_row(double data[50][50],int i,int j,int n_c,double k)//cancel的两行号&所在列
 {   
-    
     for(int l=0;l<50;l++)
     {
         data[j][l]=data[j][l]+k*data[i][l];
@@ -264,7 +323,7 @@ void row_echelon_form(double data[50][50],int m,int n)//化为阶梯型
     int done_row=0;
     for(int i=0;i<n;i++)
     {
-        if(data[done_row][i]==0)//首项不为0
+        if(data[done_row][i]==0)//首项为0 -> 交换两行
         {
             for(int k=i+1;k<m;k++)
             {
@@ -316,22 +375,22 @@ int rank_method(matrix A,bool show_ladder=false)//矩阵求秩
     }
     return rank;
 }
-void inverse(double data[50][50],int m,int n)//矩阵求逆
+matrix inverse_method(matrix A,int m,char name[10])//矩阵求逆
 {
-    double inv[50][50];
+    double inv[50][50],data[50][50];
     for(int i=0;i<m;i++)
     {
         for(int j=0;j<m;j++)
         {
+            data[i][j]=A.get_data(i,j);
             inv[i][j]=0;
             if(i==j)inv[i][j]=1;
-
         }
     }
     int done_row=0;
-    for(int i=0;i<n;i++)
+    for(int i=0;i<m;i++)
     {
-        if(data[done_row][i]==0)//首项不为0
+        if(data[done_row][i]==0)//首项为0
         {
             for(int k=i+1;k<m;k++)
             {
@@ -352,7 +411,7 @@ void inverse(double data[50][50],int m,int n)//矩阵求逆
         }
         done_row++;
     }
-    //化为单位阵
+    //阶梯型化为单位阵
     done_row=m-1;
     for(int i=m-1;i>=0;i--)
     {
@@ -371,80 +430,19 @@ void inverse(double data[50][50],int m,int n)//矩阵求逆
                 inv[i][j]=inv[i][j]/data[i][i];
             }
         }
-        for(int i=0;i<m;i++)
-        {
-            for(int j=0;j<50;j++)
-            {
-                data[i][j]=inv[i][j];
-            }
-        }
-}
-double str_to_double(char *t)//数字处理
-{
-    double k=0,result=0;
-    char *p=t;
-    bool doted=false,negitive=false,_e=false,_e_sign=true;
-    //check inf or nan
-    switch(*p)
+    for(int i=0;i<m;i++)
     {
-        case('n'):return 0.0;
-        case('i'):return 1.79769e+308;
-    }
-    if(*(p+1)=='i')
-    {
-        return -1.79769e+308;
-    }
-    while(true)
-    {   
-        if(_e)
+        for(int j=0;j<50;j++)
         {
-            int power=int(str_to_double(p));
-            for(int i=0;i<power;i++)
-            {
-                if(_e_sign)result=result*10;
-                else result=result/10;
-            }
-            break;
+            data[i][j]=inv[i][j];
         }
-        else
-        {
-            if(*(p)=='-'&&!_e)
-            {
-                negitive=true;
-            }
-            else if(*p=='e')
-            {
-                _e=true;
-                p++;
-                if(*p=='-')_e_sign=false;
-            }
-            else
-            {
-                if(*(p)!='\0')
-                {
-                    if(*(p)!='.')
-                    {
-                        if(!doted)result=result*10+int(*p-48);
-                        if(doted){result=result+k*int(*p-48);k*=0.1;}
-                    }
-                    else
-                    {
-                        doted=true;
-                        k=0.1;
-                    }
-                }
-                else
-                {
-                    if(negitive)result=-result;
-                    return result;
-                }
-            }
-        }
-        p++;
     }
-    if(negitive)result=-result;
-    return result;
+    matrix inv_mat;
+    inv_mat.init(m,m,name);
+    inv_mat.edit_data(inv);
+    return inv_mat;
 }
+
 
 //菜单显示、矩阵选择、计算条件判断
 void plus_menu(matrix mats[],int &n)//加法菜单
@@ -643,7 +641,7 @@ void determinant_menu(matrix* mats,int n)//行列式菜单
     system("read -p \"按回车键继续\"");
     return;
 }
-void transpose_menu(matrix mats[],int n)//转置菜单
+void transpose_menu(matrix mats[],int &n)//转置菜单
 {
     char mat1[10],name[10];
     int a=-1,b=-1;
@@ -660,9 +658,13 @@ void transpose_menu(matrix mats[],int n)//转置菜单
     else 
     {
         mats[a].show_mat();
-        mats[a]=transpose_method(mats[a]);
+        char name[10];
+        cout<<"请输入转置后矩阵名字："<<endl;
+        cin>>name;
+        mats[n]=transpose_method(mats[a],name);
         cout<<"转置已完成"<<endl;
-        mats[a].show_mat();
+        mats[n].show_mat();
+        n++;
     }
     system("read -p \"回车以继续\"");
     return;
@@ -714,22 +716,11 @@ void inverse_menu(matrix mats[],int &n)//求逆矩阵菜单
         mats[a].show_mat();
         matrix inv;
         char name[10];
-        double copy_data[50][50];
-        for(int i=0;i<50;i++)
-        {
-            for(int j=0;j<50;j++)
-            {
-                copy_data[i][j]=mats[a].get_data(i,j);
-            }
-        }
         cout<<"请输入逆矩阵的名字："<<endl;
         cin>>name;
-        inv.init(mats[a].get_n_r(),mats[a].get_n_c(),name);
-        inverse(copy_data,mats[a].get_n_r(),mats[a].get_n_c());
-        inv.edit_data(copy_data);
+        mats[n]=inverse_method(mats[a],mats[a].get_n_r(),name);
         cout<<"运算已完成，逆矩阵为："<<endl;
-        inv.show_mat();
-        mats[n]=inv;
+        mats[n].show_mat();
         n++;
     }
 
@@ -783,7 +774,7 @@ void save_data(matrix* mats,int n)
             for(int j2=0;j2<mats[i].get_n_c();j2++)
             {
                 if(j2==0)outfile<<endl;
-                if(mats[i].get_data(j1,j2)<1e-16&&mats[i].get_data(j1,j2)>-1e-16)outfile<<0;
+                if((mats[i].get_data(j1,j2)<1e-15)&&(mats[i].get_data(j1,j2)>-1e-15))outfile<<0;
                 else outfile<<mats[i].get_data(j1,j2);
                 if(j2<mats[i].get_n_c()-1)outfile<<' ';
             }
@@ -799,23 +790,34 @@ void input(matrix mats[],int &n)
     while(true)
     {
         char name[10],sure;
-        int m1,m2;
+        int m1,m2,a=-1;
         cout<<"现定义新矩阵。请输入矩阵名字(输入0退出)："<<endl;
         cin>>name;
-        if(name[0]=='0')break;
-        cout<<"请输入矩阵行数："<<endl;
-        cin>>m1;
-        cout<<"请输入矩阵列数："<<endl;
-        cin>>m2;
-        matrix new_mat;
-        new_mat.init(m1,m2,name);
-        new_mat.cin_data();
-        cout<<"你确定要保存这个矩阵吗？(y/n)"<<endl;
-        cin>>sure;
-        if(sure=='Y'||sure=='y')
+        for(int i=0;i<n;i++)
         {
-            mats[n]=new_mat;
-            n+=1;
+            if(strcmp(mats[i].show_name(),name)==0)a=i;
+        }
+        if(a!=-1)
+        {
+            cout<<"矩阵名已存在"<<endl;
+        }
+        else
+        {
+            if(name[0]=='0')break;
+            cout<<"请输入矩阵行数："<<endl;
+            cin>>m1;
+            cout<<"请输入矩阵列数："<<endl;
+            cin>>m2;
+            matrix new_mat;
+            new_mat.init(m1,m2,name);
+            new_mat.cin_data();
+            cout<<"你确定要保存这个矩阵吗？(y/n)"<<endl;
+            cin>>sure;
+            if(sure=='Y'||sure=='y')
+            {
+                mats[n]=new_mat;
+                n+=1;
+            }
         }
     }
     cout<<"已保存矩阵数据"<<endl;
