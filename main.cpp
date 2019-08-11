@@ -2,12 +2,13 @@
 #include<iomanip>
 #include<fstream>
 using namespace std;
+//矩阵定义部分
 class matrix
 {
 private:
     int n_r,n_c;//矩阵行数、列数
     double data[50][50];//矩阵大小上限为50x50
-    char name[10];
+    char name[10];//矩阵名(用于矩阵计算)
 public:
     int get_n_r(){return n_r;}//返回行数
     int get_n_c(){return n_c;}//返回列数
@@ -104,6 +105,8 @@ void matrix::edit_data(double(*new_data)[50])
         }
     }
 }
+
+//矩阵计算方法
 double vector_dot(double*a,double*b,int n)//向量点积
 {
     double result=0;
@@ -112,41 +115,6 @@ double vector_dot(double*a,double*b,int n)//向量点积
         result+=a[i]*b[i];
     }
     return result;
-}
-void num_multiply_menu(matrix mats[],int &n)
-{
-    char mat1[10],name[10];
-    double k;
-    int a=-1,b=-1;
-    cout<<"输入要做数乘的矩阵（输入名字）:"<<endl;
-    cin>>mat1;
-    for(int i=0;i<n;i++)
-    {
-        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
-    }
-    if(a==-1)
-    {
-        cout<<"找不到相应的矩阵"<<endl;
-    }
-    else 
-    {
-        mats[a].show_mat();
-        cout<<"输入要做乘法的数字:"<<endl;
-        cin>>k;
-        double new_data[50][50];
-        for(int i=0;i<50;i++)
-        {
-            for(int j=0;j<50;j++)
-            {
-                new_data[i][j]=k*mats[a].get_data(i,j);
-            }
-        }
-        mats[a].edit_data(new_data);
-        cout<<"已完成运算"<<endl;
-        mats[a].show_mat();
-    }
-    system("read -p \"回车以继续\"");
-    return;
 }
 matrix multiply_method(matrix A,matrix B,char*s)//矩阵乘法
 {
@@ -162,55 +130,6 @@ matrix multiply_method(matrix A,matrix B,char*s)//矩阵乘法
     }
     result.edit_data(new_data);
     return result;
-
-}
-void multiply_menu(matrix mats[],int &n)
-{
-    char mat1[10],mat2[10],name[10];
-    int a=-1,b=-1;
-    cout<<"输入要做乘法的第一个矩阵（输入名字）:"<<endl;
-    cin>>mat1;
-    for(int i=0;i<n;i++)
-    {
-        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
-    }
-    if(a==-1)
-    {
-        cout<<"找不到相应的矩阵"<<endl;
-    }
-    else 
-    {
-        mats[a].show_mat();
-        cout<<"输入要做乘法的第二个矩阵（输入名字）:"<<endl;
-        cin>>mat2;
-        for(int i=0;i<n;i++)
-        {
-            if(strcmp(mats[i].show_name(),mat2)==0)b=i;
-        }
-        if(b==-1)
-        {
-            cout<<"找不到相应的矩阵"<<endl;
-        }
-        else
-        {
-            mats[b].show_mat();
-            if(mats[a].get_n_c()!=mats[b].get_n_r())
-            {
-                cout<<"两矩阵不能相乘("<<mats[a].get_n_c()<<"!="<<mats[b].get_n_r()<<")"<<endl;
-            }
-            else
-            {
-                cout<<"请输入相乘矩阵的名字:"<<endl;
-                cin>>name;
-                mats[n]=multiply_method(mats[a],mats[b],name);
-                n++;
-                cout<<"已完成运算"<<endl;
-                mats[n-1].show_mat();
-            }
-        }
-    }
-    system("read -p \"回车以继续\"");
-    return;
 }
 matrix plus_method(matrix A,matrix B,char*s)//矩阵加法
 {
@@ -226,57 +145,8 @@ matrix plus_method(matrix A,matrix B,char*s)//矩阵加法
     }
     result.edit_data(new_data);
     return result;
-
 }
-void plus_menu(matrix mats[],int &n)
-{
-    char mat1[10],mat2[10],name[10];
-    int a=-1,b=-1;
-    cout<<"输入要做加法的第一个矩阵（输入名字）:"<<endl;
-    cin>>mat1;
-    for(int i=0;i<n;i++)
-    {
-        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
-    }
-    if(a==-1)
-    {
-        cout<<"找不到相应的矩阵"<<endl;
-    }
-    else 
-    {
-        mats[a].show_mat();
-        cout<<"输入要做加法的第二个矩阵（输入名字）:"<<endl;
-        cin>>mat2;
-        for(int i=0;i<n;i++)
-        {
-            if(strcmp(mats[i].show_name(),mat2)==0)b=i;
-        }
-        if(b==-1)
-        {
-            cout<<"找不到相应的矩阵"<<endl;
-        }
-        else
-        {
-            mats[b].show_mat();
-            if(mats[a].get_n_r()!=mats[b].get_n_r()||mats[a].get_n_c()!=mats[b].get_n_c())
-            {
-                cout<<"两矩阵不能相加！"<<endl;
-            }
-            else
-            {
-                cout<<"请输入相加矩阵的名字:"<<endl;
-                cin>>name;
-                mats[n]=plus_method(mats[a],mats[b],name);
-                n++;
-                cout<<"已完成运算"<<endl;
-                mats[n-1].show_mat();
-            }
-        }
-    }
-    system("read -p \"回车以继续\"");
-    return;
-}
-matrix power_method(matrix A,char name[10],int power)
+matrix power_method(matrix A,char name[10],int power)//幂次计算
 {
     matrix B,*p;
     B.init(A.get_n_r(),A.get_n_c(),name);
@@ -310,43 +180,206 @@ matrix power_method(matrix A,char name[10],int power)
     }
     return *p;
 }
-void power_menu(matrix mats[],int &n)
+double laplace_expansion(int n,double data[50][50])//拉普拉斯展开
 {
-    char mat1[10],name[10];
-    int a=-1,power;
-    cout<<"输入要做幂次计算的矩阵（输入名字）:"<<endl;
-    cin>>mat1;
+    double sum=0;
+    if(n==1)return data[0][0];
+    if(n==2){
+        return data[0][0]*data[1][1]-data[0][1]*data[1][0];
+    }
+    if(n>2)
+    {
+        double k=1;
+        for(int i=0;i<n;i++)//按第一行展开
+        {
+            double divided_data[50][50];
+            for(int j1=0;j1<n;j1++)
+            {   if(j1<i)
+                {
+                    for(int j2=1;j2<n;j2++)
+                    {
+                        divided_data[j2-1][j1]=data[j2][j1];
+                    }
+                }
+                else if(j1>i)
+                {
+                    for(int j2=1;j2<n;j2++)
+                    {
+                        divided_data[j2-1][j1-1]=data[j2][j1];
+                    }
+                }
+            }
+            sum+=k*data[0][i]*laplace_expansion(n-1,divided_data);
+            k=-1*k;
+        }
+    }return sum;
+}
+double determinant(matrix A)//计算行列式
+{
+    double data[50][50];
+    for(int i=0;i<A.get_n_r();i++)
+    {
+        for(int j=0;j<A.get_n_c();j++)
+        {
+            data[i][j]=A.get_data(i,j);
+        }
+    }
+    return laplace_expansion(A.get_n_r(),data);
+}
+matrix transpose_method(matrix A)//矩阵转置
+{
+    double new_data[50][50];
+    matrix newmat;
+    newmat.init(A.get_n_c(),A.get_n_r(),A.show_name());
+    for(int i=0;i<A.get_n_r();i++)
+    {
+        for(int j=0;j<A.get_n_c();j++)
+        {
+            new_data[j][i]=A.get_data(i,j);
+        }
+    }
+    newmat.edit_data(new_data);
+    return newmat;
+}
+void swap_row(double data[50][50],int i,int j)//交换两行
+{
+    double t;
+    for(int k=0;k<50;k++)
+    {
+        t=data[i][k];
+        data[i][k]=data[j][k];
+        data[j][k]=t;
+    }
+}
+void cancel_row(double data[50][50],int i,int j,int n_c,double k)//cancel的两行号&所在列
+{   
+    
+    for(int l=0;l<50;l++)
+    {
+        data[j][l]=data[j][l]+k*data[i][l];
+    }
+}
+void row_echelon_form(double data[50][50],int m,int n)//化为阶梯型
+{
+    int done_row=0;
     for(int i=0;i<n;i++)
     {
-        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
-    }
-    if(a==-1)
-    {
-        cout<<"找不到相应的矩阵"<<endl;
-    }
-    else 
-    {
-        mats[a].show_mat();
-        if(mats[a].get_n_r()!=mats[a].get_n_c())
+        if(data[done_row][i]==0)//首项不为0
         {
-            cout<<"该矩阵不是方阵！"<<endl;
+            for(int k=i+1;k<m;k++)
+            {
+                if(data[k][i]!=0)
+                {
+                    swap_row(data,i,k);
+                    break;
+                }
+            }
+            if(data[done_row][i]==0)continue;
         }
-        else
+        for(int j=done_row+1;j<m;j++)
         {
-            cout<<"输入指数:"<<endl;
-            cin>>power;
-            cout<<"请输入幂次计算后矩阵的名字:"<<endl;
-            cin>>name;
-            mats[n]=power_method(mats[a],name,power);
-            n++;
-            cout<<"已完成运算"<<endl;
-            mats[n-1].show_mat();
+            double k=-data[j][i]/data[done_row][i];
+            cancel_row(data,done_row,j,i,k);
         }
+        done_row++;
     }
-    system("read -p \"回车以继续\"");
-    return;
 }
-double str_to_double(char *t)
+int rank_method(matrix A,bool show_ladder=false)//矩阵求秩
+{
+    int rank=0;
+    double new_data[50][50];
+    for(int i=0;i<50;i++)
+    {
+        for(int j=0;j<50;j++)
+        {
+            new_data[i][j]=A.get_data(i,j);
+        }
+    }
+    row_echelon_form(new_data,A.get_n_r(),A.get_n_c());
+    if(show_ladder)
+    {
+        cout<<"矩阵的阶梯型为："<<endl;
+        matrix t;
+        char name[10]="阶梯型";
+        t.init(A.get_n_r(),A.get_n_c(),name);
+        t.edit_data(new_data);
+        t.show_mat();
+    }
+    for(;rank<min(A.get_n_c(),A.get_n_r());rank++)
+    {
+        int is_zero=0;
+        for(int k=0;k<A.get_n_c();k++)
+        {
+            if(new_data[rank][k]!=0)is_zero++;
+        }
+        if(is_zero==0)return rank;
+    }
+    return rank;
+}
+void inverse(double data[50][50],int m,int n)//矩阵求逆
+{
+    double inv[50][50];
+    for(int i=0;i<m;i++)
+    {
+        for(int j=0;j<m;j++)
+        {
+            inv[i][j]=0;
+            if(i==j)inv[i][j]=1;
+
+        }
+    }
+    int done_row=0;
+    for(int i=0;i<n;i++)
+    {
+        if(data[done_row][i]==0)//首项不为0
+        {
+            for(int k=i+1;k<m;k++)
+            {
+                if(data[k][i]!=0)
+                {
+                    swap_row(data,i,k);
+                    swap_row(inv,i,k);
+                    break;
+                }
+            }
+            if(data[done_row][i]==0)continue;
+        }
+        for(int j=done_row+1;j<m;j++)
+        {
+            double k=-data[j][i]/data[done_row][i];
+            cancel_row(data,done_row,j,i,k);
+            cancel_row(inv,done_row,j,i,k);
+        }
+        done_row++;
+    }
+    //化为单位阵
+    done_row=m-1;
+    for(int i=m-1;i>=0;i--)
+    {
+        for(int j=i-1;j>=0;j--)
+        {
+            double k=-data[j][i]/data[done_row][i];
+            cancel_row(data,done_row,j,i,k);
+            cancel_row(inv,done_row,j,i,k);
+        }
+        done_row--;
+    }
+    for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<50;j++)
+            {
+                inv[i][j]=inv[i][j]/data[i][i];
+            }
+        }
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<50;j++)
+            {
+                data[i][j]=inv[i][j];
+            }
+        }
+}
+double str_to_double(char *t)//数字处理
 {
     double k=0,result=0;
     char *p=t;
@@ -412,148 +445,176 @@ double str_to_double(char *t)
     if(negitive)result=-result;
     return result;
 }
-matrix* load_data(matrix mats[],int&n)
+
+//菜单显示、矩阵选择、计算条件判断
+void plus_menu(matrix mats[],int &n)//加法菜单
 {
-    ifstream infile;
-    infile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::in);
-    if(infile)
+    char mat1[10],mat2[10],name[10];
+    int a=-1,b=-1;
+    cout<<"输入要做加法的第一个矩阵（输入名字）:"<<endl;
+    cin>>mat1;
+    for(int i=0;i<n;i++)
+    {
+        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
+    }
+    if(a==-1)
+    {
+        cout<<"找不到相应的矩阵"<<endl;
+    }
+    else 
+    {
+        mats[a].show_mat();
+        cout<<"输入要做加法的第二个矩阵（输入名字）:"<<endl;
+        cin>>mat2;
+        for(int i=0;i<n;i++)
         {
-            int i=-1;
-            while(!infile.eof()&&(++i<50))
+            if(strcmp(mats[i].show_name(),mat2)==0)b=i;
+        }
+        if(b==-1)
+        {
+            cout<<"找不到相应的矩阵"<<endl;
+        }
+        else
+        {
+            mats[b].show_mat();
+            if(mats[a].get_n_r()!=mats[b].get_n_r()||mats[a].get_n_c()!=mats[b].get_n_c())
             {
-                char t[20];
-                int m1,m2;
-                infile>>t>>m1>>m2;
-                matrix newmat;
-                newmat.init(m1,m2,t);
-                double data[50][50];
-                for(int j1=0;j1<m1;j1++)
-                {
-                    for(int j2=0;j2<m2;j2++)
-                    {
-                        infile>>t;
-                        data[j1][j2]=str_to_double(t);
-                    }
-                }
-                newmat.edit_data(data);
-                mats[i]=newmat;
+                cout<<"两矩阵不能相加！"<<endl;
+            }
+            else
+            {
+                cout<<"请输入相加矩阵的名字:"<<endl;
+                cin>>name;
+                mats[n]=plus_method(mats[a],mats[b],name);
                 n++;
+                cout<<"已完成运算"<<endl;
+                mats[n-1].show_mat();
             }
         }
-    infile.close();
-    return mats;
-}
-void input(matrix mats[],int &n)
-{
-    while(true)
-    {
-        char name[10],sure;
-        int m1,m2;
-        cout<<"现定义新矩阵。请输入矩阵名字(输入0退出)："<<endl;
-        cin>>name;
-        if(name[0]=='0')break;
-        cout<<"请输入矩阵行数："<<endl;
-        cin>>m1;
-        cout<<"请输入矩阵列数："<<endl;
-        cin>>m2;
-        matrix new_mat;
-        new_mat.init(m1,m2,name);
-        new_mat.cin_data();
-        cout<<"你确定要保存这个矩阵吗？(y/n)"<<endl;
-        cin>>sure;
-        if(sure=='Y'||sure=='y')
-        {
-            mats[n]=new_mat;
-            n+=1;
-        }
     }
-    cout<<"已保存矩阵数据"<<endl;
-    system("read -p \"按回车键继续\"");
+    system("read -p \"回车以继续\"");
     return;
 }
-void output(matrix mats[],int n)
+void num_multiply_menu(matrix mats[],int &n)//数乘菜单
 {
-    cout<<"显示已有矩阵："<<endl;
-    if(n==0)cout<<"暂未定义任何矩阵"<<endl;
+    char mat1[10],name[10];
+    double k;
+    int a=-1,b=-1;
+    cout<<"输入要做数乘的矩阵（输入名字）:"<<endl;
+    cin>>mat1;
     for(int i=0;i<n;i++)
     {
-        mats[i].show_mat();
-        cout<<endl;
+        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
     }
-    system("read -p \"回车键继续\"");
-}
-void save_data(matrix* mats,int n)
-{
-    ofstream outfile;
-    outfile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::out);
-    for(int i=0;i<n;i++)
+    if(a==-1)
     {
-        if(i>=1)outfile<<endl;
-        outfile<<mats[i].show_name()<<' ';
-        outfile<<mats[i].get_n_r()<<' '<<mats[i].get_n_c();
-        for(int j1=0;j1<mats[i].get_n_r();j1++)
+        cout<<"找不到相应的矩阵"<<endl;
+    }
+    else 
+    {
+        mats[a].show_mat();
+        cout<<"输入要做乘法的数字:"<<endl;
+        cin>>k;
+        double new_data[50][50];
+        for(int i=0;i<50;i++)
         {
-            for(int j2=0;j2<mats[i].get_n_c();j2++)
+            for(int j=0;j<50;j++)
             {
-                if(j2==0)outfile<<endl;
-                if(mats[i].get_data(j1,j2)<1e-16&&mats[i].get_data(j1,j2)>-1e-16)outfile<<0;
-                else outfile<<mats[i].get_data(j1,j2);
-                if(j2<mats[i].get_n_c()-1)outfile<<' ';
+                new_data[i][j]=k*mats[a].get_data(i,j);
             }
         }
-        if(i<n-1)outfile<<endl;
+        mats[a].edit_data(new_data);
+        cout<<"已完成运算"<<endl;
+        mats[a].show_mat();
     }
-    cout<<"文件已保存 "<<endl;
-    outfile.close();
+    system("read -p \"回车以继续\"");
     return;
 }
-double laplace_expansion(int n,double data[50][50])//拉普拉斯展开
+void multiply_menu(matrix mats[],int &n)//乘法菜单
 {
-    double sum=0;
-    if(n==1)return data[0][0];
-    if(n==2){
-        return data[0][0]*data[1][1]-data[0][1]*data[1][0];
-    }
-    if(n>2)
+    char mat1[10],mat2[10],name[10];
+    int a=-1,b=-1;
+    cout<<"输入要做乘法的第一个矩阵（输入名字）:"<<endl;
+    cin>>mat1;
+    for(int i=0;i<n;i++)
     {
-        double k=1;
-        for(int i=0;i<n;i++)//按第一行展开
+        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
+    }
+    if(a==-1)
+    {
+        cout<<"找不到相应的矩阵"<<endl;
+    }
+    else 
+    {
+        mats[a].show_mat();
+        cout<<"输入要做乘法的第二个矩阵（输入名字）:"<<endl;
+        cin>>mat2;
+        for(int i=0;i<n;i++)
         {
-            double divided_data[50][50];
-            for(int j1=0;j1<n;j1++)
-            {   if(j1<i)
-                {
-                    for(int j2=1;j2<n;j2++)
-                    {
-                        divided_data[j2-1][j1]=data[j2][j1];
-                    }
-                }
-                else if(j1>i)
-                {
-                    for(int j2=1;j2<n;j2++)
-                    {
-                        divided_data[j2-1][j1-1]=data[j2][j1];
-                    }
-                }
+            if(strcmp(mats[i].show_name(),mat2)==0)b=i;
+        }
+        if(b==-1)
+        {
+            cout<<"找不到相应的矩阵"<<endl;
+        }
+        else
+        {
+            mats[b].show_mat();
+            if(mats[a].get_n_c()!=mats[b].get_n_r())
+            {
+                cout<<"两矩阵不能相乘("<<mats[a].get_n_c()<<"!="<<mats[b].get_n_r()<<")"<<endl;
             }
-            sum+=k*data[0][i]*laplace_expansion(n-1,divided_data);
-            k=-1*k;
-        }
-    }return sum;
-}
-double determinant(matrix A)//计算行列式
-{
-    double data[50][50];
-    for(int i=0;i<A.get_n_r();i++)
-    {
-        for(int j=0;j<A.get_n_c();j++)
-        {
-            data[i][j]=A.get_data(i,j);
+            else
+            {
+                cout<<"请输入相乘矩阵的名字:"<<endl;
+                cin>>name;
+                mats[n]=multiply_method(mats[a],mats[b],name);
+                n++;
+                cout<<"已完成运算"<<endl;
+                mats[n-1].show_mat();
+            }
         }
     }
-    return laplace_expansion(A.get_n_r(),data);
+    system("read -p \"回车以继续\"");
+    return;
 }
-void determinant_menu(matrix* mats,int n)
+void power_menu(matrix mats[],int &n)//幂次菜单
+{
+    char mat1[10],name[10];
+    int a=-1,power;
+    cout<<"输入要做幂次计算的矩阵（输入名字）:"<<endl;
+    cin>>mat1;
+    for(int i=0;i<n;i++)
+    {
+        if(strcmp(mats[i].show_name(),mat1)==0)a=i;
+    }
+    if(a==-1)
+    {
+        cout<<"找不到相应的矩阵"<<endl;
+    }
+    else 
+    {
+        mats[a].show_mat();
+        if(mats[a].get_n_r()!=mats[a].get_n_c())
+        {
+            cout<<"该矩阵不是方阵！"<<endl;
+        }
+        else
+        {
+            cout<<"输入指数:"<<endl;
+            cin>>power;
+            cout<<"请输入幂次计算后矩阵的名字:"<<endl;
+            cin>>name;
+            mats[n]=power_method(mats[a],name,power);
+            n++;
+            cout<<"已完成运算"<<endl;
+            mats[n-1].show_mat();
+        }
+    }
+    system("read -p \"回车以继续\"");
+    return;
+}
+void determinant_menu(matrix* mats,int n)//行列式菜单
 {
     cout<<"行列式计算:请输入方阵名称"<<endl;
     int chosen=-1;
@@ -582,22 +643,7 @@ void determinant_menu(matrix* mats,int n)
     system("read -p \"按回车键继续\"");
     return;
 }
-matrix transpose_method(matrix A)
-{
-    double new_data[50][50];
-    matrix newmat;
-    newmat.init(A.get_n_c(),A.get_n_r(),A.show_name());
-    for(int i=0;i<A.get_n_r();i++)
-    {
-        for(int j=0;j<A.get_n_c();j++)
-        {
-            new_data[j][i]=A.get_data(i,j);
-        }
-    }
-    newmat.edit_data(new_data);
-    return newmat;
-}
-void transpose_menu(matrix mats[],int n)
+void transpose_menu(matrix mats[],int n)//转置菜单
 {
     char mat1[10],name[10];
     int a=-1,b=-1;
@@ -621,87 +667,11 @@ void transpose_menu(matrix mats[],int n)
     system("read -p \"回车以继续\"");
     return;
 }
-void swap_row(double data[50][50],int i,int j)
-{
-    double t;
-    for(int k=0;k<50;k++)
-    {
-        t=data[i][k];
-        data[i][k]=data[j][k];
-        data[j][k]=t;
-    }
-}
-void cancel_row(double data[50][50],int i,int j,int n_c,double k)//cancel的两行号&所在列
-{   
-    
-    for(int l=0;l<50;l++)
-    {
-        data[j][l]=data[j][l]+k*data[i][l];
-    }
-}
-void row_echelon_form(double data[50][50],int m,int n)//化为阶梯型
-{
-    int done_row=0;
-    for(int i=0;i<n;i++)
-    {
-        if(data[done_row][i]==0)//首项不为0
-        {
-            for(int k=i+1;k<m;k++)
-            {
-                if(data[k][i]!=0)
-                {
-                    swap_row(data,i,k);
-                    break;
-                }
-            }
-            if(data[done_row][i]==0)continue;
-        }
-        for(int j=done_row+1;j<m;j++)
-        {
-            double k=-data[j][i]/data[done_row][i];
-            cancel_row(data,done_row,j,i,k);
-        }
-        done_row++;
-    }
-}
-
-int rank_method(matrix A,bool show_ladder=false)
-{
-    int rank=0;
-    double new_data[50][50];
-    for(int i=0;i<50;i++)
-    {
-        for(int j=0;j<50;j++)
-        {
-            new_data[i][j]=A.get_data(i,j);
-        }
-    }
-    row_echelon_form(new_data,A.get_n_r(),A.get_n_c());
-    if(show_ladder)
-    {
-        cout<<"矩阵的阶梯型为："<<endl;
-        matrix t;
-        char name[10]="阶梯型";
-        t.init(A.get_n_r(),A.get_n_c(),name);
-        t.edit_data(new_data);
-        t.show_mat();
-    }
-    for(;rank<min(A.get_n_c(),A.get_n_r());rank++)
-    {
-        int is_zero=0;
-        for(int k=0;k<A.get_n_c();k++)
-        {
-            if(new_data[rank][k]!=0)is_zero++;
-        }
-        if(is_zero==0)return rank;
-    }
-    return rank;
-}
-void rank_menu(matrix mats[],int n)
+void rank_menu(matrix mats[],int n)//求秩菜单
 {
     char mat1[10],name[10];
     int a=-1,b=-1;
-    cout<<"输入要计算秩的矩阵（输入名字）:"<<endl;
+    cout<<"输入要计算秩和阶梯型的矩阵（输入名字）:"<<endl;
     cin>>mat1;
     for(int i=0;i<n;i++)
     {
@@ -720,71 +690,7 @@ void rank_menu(matrix mats[],int n)
     system("read -p \"回车以继续\"");
     return;
 }
-void inverse(double data[50][50],int m,int n)//高斯消元法
-{
-    double inv[50][50];
-    for(int i=0;i<m;i++)
-    {
-        for(int j=0;j<m;j++)
-        {
-            inv[i][j]=0;
-            if(i==j)inv[i][j]=1;
-
-        }
-    }
-    int done_row=0;
-    for(int i=0;i<n;i++)
-    {
-        if(data[done_row][i]==0)//首项不为0
-        {
-            for(int k=i+1;k<m;k++)
-            {
-                if(data[k][i]!=0)
-                {
-                    swap_row(data,i,k);
-                    swap_row(inv,i,k);
-                    break;
-                }
-            }
-            if(data[done_row][i]==0)continue;
-        }
-        for(int j=done_row+1;j<m;j++)
-        {
-            double k=-data[j][i]/data[done_row][i];
-            cancel_row(data,done_row,j,i,k);
-            cancel_row(inv,done_row,j,i,k);
-        }
-        done_row++;
-    }
-    //化为单位阵
-    done_row=m-1;
-    for(int i=m-1;i>=0;i--)
-    {
-        for(int j=i-1;j>=0;j--)
-        {
-            double k=-data[j][i]/data[done_row][i];
-            cancel_row(data,done_row,j,i,k);
-            cancel_row(inv,done_row,j,i,k);
-        }
-        done_row--;
-    }
-    for(int i=0;i<m;i++)
-        {
-            for(int j=0;j<50;j++)
-            {
-                inv[i][j]=inv[i][j]/data[i][i];
-            }
-        }
-        for(int i=0;i<m;i++)
-        {
-            for(int j=0;j<50;j++)
-            {
-                data[i][j]=inv[i][j];
-            }
-        }
-}
-
-void inverse_menu(matrix mats[],int &n)
+void inverse_menu(matrix mats[],int &n)//求逆矩阵菜单
 {
     char mat1[10],name[10];
     int a=-1,b=-1;
@@ -830,7 +736,106 @@ void inverse_menu(matrix mats[],int &n)
     system("read -p \"回车以继续\"");
     return;
 }
-int main()
+
+//IO方法
+matrix* load_data(matrix mats[],int&n)
+{
+    ifstream infile;
+    infile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::in);
+    if(infile)
+        {
+            int i=-1;
+            while(!infile.eof()&&(++i<50))
+            {
+                char t[20];
+                int m1,m2;
+                infile>>t>>m1>>m2;
+                matrix newmat;
+                newmat.init(m1,m2,t);
+                double data[50][50];
+                for(int j1=0;j1<m1;j1++)
+                {
+                    for(int j2=0;j2<m2;j2++)
+                    {
+                        infile>>t;
+                        data[j1][j2]=str_to_double(t);
+                    }
+                }
+                newmat.edit_data(data);
+                mats[i]=newmat;
+                n++;
+            }
+        }
+    infile.close();
+    return mats;
+}
+void save_data(matrix* mats,int n)
+{
+    ofstream outfile;
+    outfile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::out);
+    for(int i=0;i<n;i++)
+    {
+        if(i>=1)outfile<<endl;
+        outfile<<mats[i].show_name()<<' ';
+        outfile<<mats[i].get_n_r()<<' '<<mats[i].get_n_c();
+        for(int j1=0;j1<mats[i].get_n_r();j1++)
+        {
+            for(int j2=0;j2<mats[i].get_n_c();j2++)
+            {
+                if(j2==0)outfile<<endl;
+                if(mats[i].get_data(j1,j2)<1e-16&&mats[i].get_data(j1,j2)>-1e-16)outfile<<0;
+                else outfile<<mats[i].get_data(j1,j2);
+                if(j2<mats[i].get_n_c()-1)outfile<<' ';
+            }
+        }
+        if(i<n-1)outfile<<endl;
+    }
+    cout<<"文件已保存 "<<endl;
+    outfile.close();
+    return;
+}
+void input(matrix mats[],int &n)
+{
+    while(true)
+    {
+        char name[10],sure;
+        int m1,m2;
+        cout<<"现定义新矩阵。请输入矩阵名字(输入0退出)："<<endl;
+        cin>>name;
+        if(name[0]=='0')break;
+        cout<<"请输入矩阵行数："<<endl;
+        cin>>m1;
+        cout<<"请输入矩阵列数："<<endl;
+        cin>>m2;
+        matrix new_mat;
+        new_mat.init(m1,m2,name);
+        new_mat.cin_data();
+        cout<<"你确定要保存这个矩阵吗？(y/n)"<<endl;
+        cin>>sure;
+        if(sure=='Y'||sure=='y')
+        {
+            mats[n]=new_mat;
+            n+=1;
+        }
+    }
+    cout<<"已保存矩阵数据"<<endl;
+    system("read -p \"按回车键继续\"");
+    return;
+}
+void output(matrix mats[],int n)
+{
+    cout<<"显示已有矩阵："<<endl;
+    if(n==0)cout<<"暂未定义任何矩阵"<<endl;
+    for(int i=0;i<n;i++)
+    {
+        mats[i].show_mat();
+        cout<<endl;
+    }
+    system("read -p \"回车键继续\"");
+}
+
+
+int main()//主函数入口
 {
     matrix mats1[50];
     int n=0,chosen_num;
