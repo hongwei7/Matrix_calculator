@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include<cstring>
 #include<iostream>
 #include<iomanip>
 #include<fstream>
@@ -732,7 +734,7 @@ void inverse_menu(matrix mats[],int &n)//求逆矩阵菜单
 matrix* load_data(matrix mats[],int&n)
 {
     ifstream infile;
-    infile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::in);
+    infile.open("data.txt",ios::in);
     if(infile)
         {
             int i=-1;
@@ -763,7 +765,7 @@ matrix* load_data(matrix mats[],int&n)
 void save_data(matrix* mats,int n)
 {
     ofstream outfile;
-    outfile.open("/Users/lulu/Desktop/C++/Matrix_cal/Matrix_calculator/data.txt",ios::out);
+    outfile.open("data.txt",ios::out);
     for(int i=0;i<n;i++)
     {
         if(i>=1)outfile<<endl;
