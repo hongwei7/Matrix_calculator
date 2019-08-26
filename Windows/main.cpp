@@ -132,7 +132,7 @@ void matrix::show_mat()
         cout<<'[';
         for(int j=0;j<n_c;j++)
         {
-            if(data[i][j]<1e-15&&data[i][j]>-1e-15)cout<<setw(lenth-1)<<0.0;
+            if(data[i][j]<1e-5&&data[i][j]>-1e-5)cout<<setw(lenth-1)<<0.0;
             else cout<<setw(lenth-1)<<data[i][j];
             cout<<',';
         }
@@ -792,7 +792,7 @@ void save_data(matrix* mats,int n)
             for(int j2=0;j2<mats[i].get_n_c();j2++)
             {
                 if(j2==0)outfile<<endl;
-                if((mats[i].get_data(j1,j2)<1e-15)&&(mats[i].get_data(j1,j2)>-1e-15))outfile<<0;
+                if((mats[i].get_data(j1,j2)<1e-5)&&(mats[i].get_data(j1,j2)>-1e-5))outfile<<0;
                 else outfile<<mats[i].get_data(j1,j2);
                 if(j2<mats[i].get_n_c()-1)outfile<<' ';
             }

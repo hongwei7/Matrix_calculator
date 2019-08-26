@@ -21,7 +21,7 @@ double str_to_double(char *t)//数值处理
         return -1.79769e+308;
     }
     while(true)
-    {   
+    {
         if(_e)
         {
             int power=int(str_to_double(p));
@@ -98,10 +98,10 @@ void matrix::init(int a,int b,char s[])
     strcpy(name,s);
 }
 void matrix::cin_data()
-{   
+{
     cout<<"请按行输入矩阵内容("<<n_r<<"x"<<n_c<<")："<<endl;
     for(int k=0;k<n_r;k++)
-    {   
+    {
         cout<<"请输入第"<<k+1<<"行"<<endl;
         int i=0;
         if(k==0)getchar();
@@ -118,7 +118,7 @@ void matrix::cin_data()
             }
             p++;
             data[k][i]=str_to_double(char_number);
-            i++;        
+            i++;
         }
     }cout<<"已生成";
     show_mat();
@@ -132,7 +132,7 @@ void matrix::show_mat()
         cout<<'[';
         for(int j=0;j<n_c;j++)
         {
-            if(data[i][j]<1e-15&&data[i][j]>-1e-15)cout<<setw(lenth-1)<<0.0;
+            if(data[i][j]<1e-5&&data[i][j]>-1e-5)cout<<setw(lenth-1)<<0.0;
             else cout<<setw(lenth-1)<<data[i][j];
             cout<<',';
         }
@@ -314,7 +314,7 @@ void swap_row(double data[50][50],int i,int j)//交换两行
     }
 }
 void cancel_row(double data[50][50],int i,int j,int n_c,double k)//cancel的两行号&所在列
-{   
+{
     for(int l=0;l<50;l++)
     {
         data[j][l]=data[j][l]+k*data[i][l];
@@ -461,7 +461,7 @@ void plus_menu(matrix mats[],int &n)//加法菜单
     {
         cout<<"找不到相应的矩阵"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         cout<<"输入要做加法的第二个矩阵（输入名字）:"<<endl;
@@ -510,7 +510,7 @@ void num_multiply_menu(matrix mats[],int &n)//数乘菜单
     {
         cout<<"找不到相应的矩阵"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         cout<<"输入要做乘法的数字:"<<endl;
@@ -544,7 +544,7 @@ void multiply_menu(matrix mats[],int &n)//乘法菜单
     {
         cout<<"找不到相应的矩阵"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         cout<<"输入要做乘法的第二个矩阵（输入名字）:"<<endl;
@@ -592,7 +592,7 @@ void power_menu(matrix mats[],int &n)//幂次菜单
     {
         cout<<"找不到相应的矩阵"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         if(mats[a].get_n_r()!=mats[a].get_n_c())
@@ -657,7 +657,7 @@ void transpose_menu(matrix mats[],int &n)//转置菜单
     {
         cout<<"找不到相应的矩阵"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         char name[10];
@@ -685,7 +685,7 @@ void rank_menu(matrix mats[],int n)//求秩菜单
     {
         cout<<"找不到相应的矩阵"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         int rank=rank_method(mats[a],true);
@@ -713,7 +713,7 @@ void inverse_menu(matrix mats[],int &n)//求逆矩阵菜单
         mats[a].show_mat();
         cout<<"矩阵非方阵或不可逆"<<endl;
     }
-    else 
+    else
     {
         mats[a].show_mat();
         matrix inv;
@@ -776,7 +776,7 @@ void save_data(matrix* mats,int n)
             for(int j2=0;j2<mats[i].get_n_c();j2++)
             {
                 if(j2==0)outfile<<endl;
-                if((mats[i].get_data(j1,j2)<1e-15)&&(mats[i].get_data(j1,j2)>-1e-15))outfile<<0;
+                if((mats[i].get_data(j1,j2)<1e-5)&&(mats[i].get_data(j1,j2)>-1e-5))outfile<<0;
                 else outfile<<mats[i].get_data(j1,j2);
                 if(j2<mats[i].get_n_c()-1)outfile<<' ';
             }
